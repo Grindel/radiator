@@ -19,6 +19,9 @@ function createStation() {
 function delete() {
 	global $db;
 	$db->query("DELETE FROM ${_REQUEST['obj']}s WHERE id = ${_REQUEST['id']}");	
+	if ($_REQUEST['obj'] == 'bookmark') {
+		unlink('bookmarks/'. $_REQUEST['sample'] .'.mp3' );
+	};
 	header('Location: /');
 }
 

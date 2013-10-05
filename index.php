@@ -1,6 +1,7 @@
 <?php
 
 $db	= new SQLite3('radiator.sqlite3');
+$db->busyTimeout(5000);
 require 'radiator.php';
 
 if (isset($_REQUEST['act'])) {
@@ -12,6 +13,10 @@ if (isset($_REQUEST['act'])) {
 		case 'del':
 			delete();
 			break;
+
+		case 'delall':
+			deleteAll();
+			break;
 		
 		default:
 			header('Location: /');	
@@ -19,11 +24,12 @@ if (isset($_REQUEST['act'])) {
 	}
 };
 
-$stations = selectFromDb('SELECT * FROM stations');
+$stations = selectFromDb('SELECT * FROM stations ORDER BY stations.id DESC');
 $bookmarks = selectFromDb('SELECT bookmarks.id, bookmarks.name, bookmarks.sample, stations.name AS station_name
 							FROM bookmarks
 							LEFT  JOIN stations
-							ON stations.id=bookmarks.station_id;');
+							ON stations.id=bookmarks.station_id
+							ORDER BY bookmarks.id DESC;');
 
 ?>
 <!DOCTYPE html>
@@ -58,7 +64,8 @@ $bookmarks = selectFromDb('SELECT bookmarks.id, bookmarks.name, bookmarks.sample
 						<tr>
 							<th>Название</th>
 							<th>URL</th>
-							<th></th>
+							<th><span data-obj="station" title="Удалить все станции!" class="remove_all glyphicon glyphicon-remove"></span>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -93,7 +100,7 @@ $bookmarks = selectFromDb('SELECT bookmarks.id, bookmarks.name, bookmarks.sample
 						<tr>
 							<th>Станция</th>
 							<th>Трек</th>
-							<th></th>
+							<th><span data-obj="bookmark" title="Удалить все закладки!" class="remove_all glyphicon glyphicon-remove"></span></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -103,9 +110,11 @@ $bookmarks = selectFromDb('SELECT bookmarks.id, bookmarks.name, bookmarks.sample
 								<?=$bookmark['station_name']?>
 							</td>
 							<td class="sample">
+								<? if ($bookmark['sample']) { ?>
 								<audio src="bookmarks/<?=$bookmark['sample']?>.mp3"></audio>
 								<span class="switch glyphicon glyphicon-play"></span>
-								<span><a href="http://vk.com/audio?q=<?=$bookmark['name']?>" target="_blank" title="Искать Вконтакте"><?=$bookmark['name']?>
+								<? } ?>
+								<span><a href="http://vk.com/audio?q=<?=urlencode($bookmark['name'])?>" target="_blank" title="Искать Вконтакте"><?=$bookmark['name']?>
 								</a></span>
 							</td>
 							<td>

@@ -7,12 +7,12 @@ import sys, time, tempfile
 
 class RadiatorDaemon(daemon.Daemon):
 	def run(self):
-		r = radiator.Radiator()
+		r = radiator.Radiator('/home/pi/www/radiator/radiator.sqlite3')
 		while True:
 			r.action()
 
 if __name__ == '__main__':
-	pidFile = tempfile.gettempdir() + 'radiatorDaemon.pid'
+	pidFile = tempfile.gettempdir() + '/radiatorDaemon.pid'
 	daemon = RadiatorDaemon(pidFile)
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:

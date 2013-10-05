@@ -9,30 +9,53 @@ class Radiator:
 
 	def __init__(self, db = 'radiator.sqlite3'):
 		
-		self.stations      = []
+		self.conf		= {}
+		self.stations	= []
+		self.homeDir	= "/home/pi/www/radiator"	
 		
 		#DB SETUP
 		self.db = sqlite3.connect(db)
 		self.c = self.db.cursor()
+		
+		#GET CONFIG
+		self.c.execute('SELECT key, value FROM conf')
+		for row in self.c:
+			self.conf[row[0]] = row[1]
+
 		#MPD SETUP
 		self.mpd = MPDClient()
-		self.mpd.timeout = 10
-		self.mpd.idletimeout = None
-		self.mpd.connect("localhost", 6600)
-		self.mpd.clear()
-		self.play()
+		self.mpd.connect("/var/run/mpd/socket", 6600)
 		
-		#GET STATIONS
-		self.c.execute('SELECT id, name, url FROM stations')
-		for row in self.c:
-			self.stations.append({'id': row[0], 'name': row[1], 'url': row[2], 'pl_id': self.mpd.addid(row[2])})
+		#SET STATIONS
+		self.c.execute('SELECT id, name, url FROM stations ORDER BY stations.id DESC')
+		for row in self.c: 
+			self.stations.append({'id': row[0], 'name': row[1], 'url': row[2]})
 
-		#SET BUTTONS
-		#button[0] - pin, button[1] - last state
+		if self.conf['stationsV'] != self.conf['stationsU'] or len(self.mpd.playlistinfo()) != len(self.stations):
+			self.mpd.clear()
+			for st in self.stations:
+				st['pl_id'] = self.mpd.addid(st['url'])
+
+			self.c.execute("UPDATE conf SET value = '%s' WHERE key = 'stationsU'" % self.conf['stationsV'])
+			self.db.commit()
+		else:
+			for st in self.stations:
+				st['pl_id'] = self.getPlStationByUrl(st['url'])['id']
+
+		#AUTO PLAY!
+		self.play()
+
+		#SET BUTTONS AND LED
+		GPIO.setwarnings(False)
 		GPIO.setmode(GPIO.BCM)
+		#button[0] - pin, button[1] - last state
 		self.buttons = [[18, 0], [23, 0], [24, 0]]
+		self.LED = 17;
+		GPIO.setup(self.LED,GPIO.OUT)
+		GPIO.output(self.LED, False)
 		for button in self.buttons:
 			GPIO.setup(button[0],GPIO.IN)
+		
 
 
 	def pressed(self):
@@ -73,18 +96,33 @@ class Radiator:
 				return st;
 		return False
 
+	def getPlStationByUrl(self, url):
+		plStations = self.mpd.playlistinfo()
+		for st in plStations:
+			if st['file'] == url:
+				return st;
+		return False
+
 	def bookmark(self):
 		if self.mpd.status()['state'] != 'play':
 			return
-		station = self.getStByPl_id(self.mpd.status()['songid'])
-		songTitle = self.mpd.currentsong()['title']
-		sampleName = str(int(time.time()))
-		call(['streamripper', station['url'], '-d', 'bookmarks', '-A', '-a', "%s_.mp3" % sampleName ,'-l', '5'])
-		call(['lame', '-f', '-q', '9', "bookmarks/%s_.mp3" % sampleName, "bookmarks/%s.mp3" % sampleName ])
-		call(['rm', "bookmarks/%s_.cue" % sampleName])
-		call(['rm', "bookmarks/%s_.mp3" % sampleName])
-		self.c.execute("INSERT INTO bookmarks (station_id, name, sample) VALUES ('%s', '%s', '%s')" % (station['id'], songTitle, sampleName))
+		try:
+			station = self.getStByPl_id(self.mpd.status()['songid'])
+			songTitle = self.mpd.currentsong()['title']
+			sampleName = str(int(time.time()))
+		except:
+			return
+		GPIO.output(self.LED, True)
+		self.c.execute("INSERT INTO bookmarks (station_id, name) VALUES (?, ?)", [station['id'], songTitle])
+		bookmarkId = self.c.lastrowid
 		self.db.commit()
+		call(['streamripper', station['url'], '-d', "%s/bookmarks" % self.homeDir, '-A', '-a', "%s_.mp3" % sampleName ,'-l', '10'])
+		call(['lame', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName), "%s/bookmarks/%s.mp3" % (self.homeDir, sampleName) ])
+		call(['rm', "%s/bookmarks/%s_.cue" % (self.homeDir, sampleName)])
+		call(['rm', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName)])
+		self.c.execute("UPDATE bookmarks SET sample = '%s' WHERE id = %s" % (sampleName, bookmarkId))
+		self.db.commit()
+		GPIO.output(self.LED, False)
 
 	def action(self):
 		button = self.pressed()
@@ -103,3 +141,5 @@ class Radiator:
 if __name__ == '__main__':
     r = Radiator()
     r.play()
+    while True:
+    	r.action()

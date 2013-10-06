@@ -36,7 +36,7 @@ $bookmarks = selectFromDb('SELECT bookmarks.id, bookmarks.name, bookmarks.sample
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=0.75">
 	<meta name="author" content="Grindel">
 	<link rel="shortcut icon" href="favicon.png">
 

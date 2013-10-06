@@ -24,7 +24,7 @@ $(document).ready(function () {
 	});
 
 	$('.remove_all').on('click', function (){
-		if (confirm("Будут удалны све объекты! Вы уверены?")){
+		if (confirm("Будут удалны все объекты! Вы уверены?")){
 			window.location.href = '/?act=delall&obj='+ $(this).data('obj');
 		};
 	});

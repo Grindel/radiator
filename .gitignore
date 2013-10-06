@@ -1,1 +1,3 @@
-radiator.db
+radiator.sqlite3
+*pyc
+bookmarks/*

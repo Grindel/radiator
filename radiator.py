@@ -116,7 +116,7 @@ class Radiator:
 		self.c.execute("INSERT INTO bookmarks (station_id, name) VALUES (?, ?)", [station['id'], songTitle])
 		bookmarkId = self.c.lastrowid
 		self.db.commit()
-		call(['streamripper', station['url'], '-d', "%s/bookmarks" % self.homeDir, '-A', '-a', "%s_.mp3" % sampleName ,'-l', '10'])
+		call(['streamripper', station['url'], '-d', "%s/bookmarks" % self.homeDir, '-A', '-a', "%s_" % sampleName ,'-l', '10'])
 		call(['lame', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName), "%s/bookmarks/%s.mp3" % (self.homeDir, sampleName) ])
 		call(['rm', "%s/bookmarks/%s_.cue" % (self.homeDir, sampleName)])
 		call(['rm', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName)])

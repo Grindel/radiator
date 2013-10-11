@@ -50,7 +50,7 @@ class Radiator:
 		GPIO.setmode(GPIO.BCM)
 		#button[0] - pin, button[1] - last state
 		self.buttons = [[18, 0], [23, 0], [24, 0]]
-		self.LED = 17;
+		self.LED = 4;
 		GPIO.setup(self.LED,GPIO.OUT)
 		GPIO.output(self.LED, False)
 		for button in self.buttons:

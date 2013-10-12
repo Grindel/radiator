@@ -1,0 +1,106 @@
+
+.header {
+	margin-bottom: 30px;
+	border-bottom: 1px solid #282828;
+}
+
+.header h1 {
+	float: left;
+}
+
+.header .nav {
+	margin-top: 20px;
+}
+
+#controls {
+	text-align: center;
+	margin: 0 auto;
+}
+
+#controls .control {
+	font-size: 3.2em;
+	color: #888;
+}
+
+#controls .control:hover, #controls .control:active {
+	text-decoration: none;
+}
+
+#controls .info {
+	min-height: 8em;
+}
+
+#controls .active {
+	color: #DDD;
+}
+
+#station_name, #song_title {
+	display: block;
+}
+
+#station_name {
+	font-size: 2.2em;
+	font-weight: bold;
+	margin-top: .2em;
+}
+
+#song_title {
+	font-size: 1.75em;
+	font-weight: lighter;
+	margin-top: 0;
+	margin-bottom: .75em;
+}
+
+.slider-wrapper{
+	width: 80%;
+	padding: 0 1.2em;
+	margin: 3em auto;
+	height: .25em;
+	background: #fff;
+	-webkit-border-radius: .2em;
+}
+
+#volume {
+	
+}
+
+.ui-slider {
+	position: relative;
+	text-align: left;
+}
+
+.ui-slider-range {
+	height: .25em;
+	background: #2a9fd6;
+	-webkit-border-radius: .2em 0 0 .2em;
+	margin-left: -1.2em;
+}
+
+.ui-slider-handle {
+	top: -1.05em;
+	width: 2.4em;
+	height: 2.4em;
+	margin-left: -1.2em;
+	-webkit-border-radius: 1.2em;
+	position: absolute;
+	background: #888;
+	border: .2em solid #888;
+	z-index: 2;
+	cursor: default;
+}
+
+.switch, .remove {
+	cursor: pointer;
+}
+
+.remove_all {
+	color: #cc0000;
+}
+
+.page-header>h1 {
+	text-align: center;
+}
+
+position: absolute;
+width: 20px;
+height: 20px;

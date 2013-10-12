@@ -7,11 +7,11 @@ import RPi.GPIO as GPIO
 
 class Radiator:
 
-	def __init__(self, db = 'radiator.sqlite3'):
+	def __init__(self, db = '/home/pi/radiator/radiator.sqlite3'):
 		
 		self.conf		= {}
 		self.stations	= []
-		self.homeDir	= "/home/pi/www/radiator"	
+		self.homeDir	= "/home/pi/radiator"	
 		
 		#DB SETUP
 		self.db = sqlite3.connect(db)
@@ -34,6 +34,7 @@ class Radiator:
 		if self.conf['stationsV'] != self.conf['stationsU'] or len(self.mpd.playlistinfo()) != len(self.stations):
 			self.mpd.clear()
 			for st in self.stations:
+				print st['url']
 				st['pl_id'] = self.mpd.addid(st['url'])
 
 			self.c.execute("UPDATE conf SET value = '%s' WHERE key = 'stationsU'" % self.conf['stationsV'])
@@ -116,10 +117,10 @@ class Radiator:
 		self.c.execute("INSERT INTO bookmarks (station_id, name) VALUES (?, ?)", [station['id'], songTitle])
 		bookmarkId = self.c.lastrowid
 		self.db.commit()
-		call(['streamripper', station['url'], '-d', "%s/bookmarks" % self.homeDir, '-A', '-a', "%s_" % sampleName ,'-l', '10'])
-		call(['lame', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName), "%s/bookmarks/%s.mp3" % (self.homeDir, sampleName) ])
-		call(['rm', "%s/bookmarks/%s_.cue" % (self.homeDir, sampleName)])
-		call(['rm', "%s/bookmarks/%s_.mp3" % (self.homeDir, sampleName)])
+		call(['streamripper', station['url'], '-d', "%s/www/bookmarks" % self.homeDir, '-A', '-a', "%s_" % sampleName ,'-l', '10'])
+		call(['lame', "%s/www/bookmarks/%s_.mp3" % (self.homeDir, sampleName), "%s/www/bookmarks/%s.mp3" % (self.homeDir, sampleName) ])
+		call(['rm', "%s/www/bookmarks/%s_.cue" % (self.homeDir, sampleName)])
+		call(['rm', "%s/www/bookmarks/%s_.mp3" % (self.homeDir, sampleName)])
 		self.c.execute("UPDATE bookmarks SET sample = '%s' WHERE id = %s" % (sampleName, bookmarkId))
 		self.db.commit()
 		GPIO.output(self.LED, False)

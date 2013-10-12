@@ -7,7 +7,7 @@ import sys, time, tempfile
 
 class RadiatorDaemon(daemon.Daemon):
 	def run(self):
-		r = radiator.Radiator('/home/pi/www/radiator/radiator.sqlite3')
+		r = radiator.Radiator('/home/pi/radiator/radiator.sqlite3')
 		while True:
 			r.action()
 

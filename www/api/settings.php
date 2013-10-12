@@ -19,7 +19,7 @@ if (isset($_REQUEST['act'])) {
 			break;
 
 		case 'update':
-			updateSys();
+			updateSystem();
 			break;
 		
 		default:

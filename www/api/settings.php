@@ -17,6 +17,10 @@ if (isset($_REQUEST['act'])) {
 		case 'delall':
 			deleteAll();
 			break;
+
+		case 'update':
+			updateSys();
+			break;
 		
 		default:
 			header('Location: /');	

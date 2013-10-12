@@ -57,4 +57,8 @@ function deleteAll() {
 	}	
 }
 
+function updateSystem(){
+	exec('git pull');
+}
+
 ?>

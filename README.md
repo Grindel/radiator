@@ -1,4 +1,4 @@
-radiator
+Radiator
 ========
 
-rpi online radio receiver
+rpi online radio receiver with webUI
